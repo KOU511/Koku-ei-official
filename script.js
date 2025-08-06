@@ -43,12 +43,23 @@ document.addEventListener('DOMContentLoaded', () => {
             gsap.from('.hero-section__content', { opacity: 0, y: 20, duration: 1.5, delay: 2.8, ease: 'power3.out' });
             gsap.from('.scroll-down-indicator', { opacity: 0, duration: 1.5, delay: 3.5, ease: 'power3.out' });
         }
-        const targets = ['.section-title', '.card', '.profile-card', '.lore-content', '.news-list li'];
+        const targets = ['.section-title', '.card', '.profile-card', '.lore-content', '.news-list li', '.music-links-section'];
         targets.forEach(target => {
             const elements = document.querySelectorAll(target);
             if (elements.length > 0) {
                 gsap.to(elements, {
                     opacity: 1, y: 0, duration: 1.2, ease: 'power3.out', stagger: 0.2,
+                    scrollTrigger: { trigger: elements[0].parentNode, start: 'top 85%', once: true, }
+                });
+            }
+        });
+        // Add separate animations for social links and music links without scale
+        const linkSections = ['.social-links', '.music-links'];
+        linkSections.forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            if (elements.length > 0) {
+                gsap.to(elements, {
+                    opacity: 1, y: 0, duration: 1.2, ease: 'power3.out',
                     scrollTrigger: { trigger: elements[0].parentNode, start: 'top 85%', once: true, }
                 });
             }
@@ -96,52 +107,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const mainArtwork = document.getElementById('main-artwork');
         if (trackItems.length === 0 || !mainArtwork) return;
         const defaultArtworkSrc = mainArtwork.src;
-
         trackItems.forEach(item => {
-            const summary = item.querySelector('summary');
-            const detailWrapper = item.querySelector('.tracklist__item-content-wrapper');
-            const detailContent = item.querySelector('.tracklist__item-detail-inner');
-            
-            gsap.set(detailWrapper, { height: 0 });
-
-            summary.addEventListener('click', (e) => {
-                e.preventDefault();
-                const wasOpen = item.open;
-
-                // いったんすべてを閉じるアニメーション
-                const closingPromises = [];
-                trackItems.forEach(otherItem => {
-                    if (otherItem.open) {
-                        const promise = new Promise(resolve => {
-                             gsap.to(otherItem.querySelector('.tracklist__item-content-wrapper'), {
-                                height: 0,
-                                duration: 0.4,
-                                ease: 'power2.inOut',
-                                onComplete: () => {
-                                    otherItem.open = false;
-                                    resolve();
-                                }
-                            });
-                        });
-                        closingPromises.push(promise);
-                    }
-                });
-
-                // すべてが閉じられた後に開く
-                Promise.all(closingPromises).then(() => {
-                    if (!wasOpen) {
-                        item.open = true;
-                        gsap.to(detailWrapper, {
-                            height: 'auto',
-                            duration: 0.4,
-                            ease: 'power2.inOut'
-                        });
-                    }
-                });
-            });
-
             item.addEventListener('toggle', () => {
                 if (item.open) {
+                    trackItems.forEach(otherItem => {
+                        if (otherItem !== item) {
+                            otherItem.open = false;
+                        }
+                    });
                     const newImageSrc = item.dataset.image;
                     if (mainArtwork.src !== newImageSrc) {
                         gsap.to(mainArtwork, {
@@ -154,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     const anyItemIsOpen = Array.from(trackItems).some(i => i.open);
                     if (!anyItemIsOpen && mainArtwork.src !== defaultArtworkSrc) {
-                         gsap.to(mainArtwork, {
+                        gsap.to(mainArtwork, {
                             opacity: 0, duration: 0.2, onComplete: () => {
                                 mainArtwork.src = defaultArtworkSrc;
                                 gsap.to(mainArtwork, { opacity: 1, duration: 0.2 });
