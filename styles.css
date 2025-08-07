@@ -208,3 +208,19 @@ body.is-scrolled-past-hero #background-animation { opacity: 1; }
     text-align: center; /* 「...and more」ボタンを中央揃え */
     margin-top: 2rem;
 }
+
+/* Responsive adjustments
+-------------------------------------------------- */
+@media (max-width: 768px) {
+    /* Profile Card for Mobile */
+    .profile-card {
+        /* 2列グリッドを1列に変更 */
+        grid-template-columns: 1fr;
+        /* 要素間の余白を調整 */
+        gap: 2rem;
+        /* カード内の余白を調整 */
+        padding: 2rem;
+        /* テキストを中央揃えに */
+        text-align: center;
+    }
+}
